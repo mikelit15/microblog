@@ -1,13 +1,13 @@
 from flask import render_template, flash, redirect, url_for, request
 from urllib.parse import urlsplit
 from app import app
-from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm, PostForm, ResetPasswordRequestForm
+from app.forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm, PostForm, ResetPasswordRequestForm, ResetPasswordForm
 from flask_login import current_user, login_user, logout_user, login_required
 import sqlalchemy as sa
 from app import db
 from app.models import User, Post
 from datetime import datetime, timezone
-from app.email import send_password_request_email
+from app.email import send_password_reset_email
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -169,7 +169,7 @@ def reset_password_request():
     if form.validate_on_submit():
         user = db.session.scalar(sa.select(User).where(User.email == form.email.data))
         if user:
-            send_password_request_email(user)
+            send_password_reset_email(user)
         flash('Check your email for the instructions to reset your password')
         return redirect(url_for('login'))
     return render_template('reset_password_request.html', title='Reset Password', form=form)
